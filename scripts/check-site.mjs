@@ -9,8 +9,13 @@ export function checkSite(root = projectRoot) {
   const assert = (ok, message) => { if (!ok) throw new Error(message); };
   const cfg = JSON.parse(fs.readFileSync(path.join(root, 'wrangler.jsonc'), 'utf8'));
   const preview = JSON.parse(fs.readFileSync(path.join(root, 'wrangler.preview.jsonc'), 'utf8'));
-  assert(cfg.assets?.directory === './dist', 'assets.directory cần là ./dist.');
-  assert(!cfg.main, 'Bản thiệp thuần tĩnh không cần main/Worker script.');
+  for (const config of [cfg, preview]) {
+    assert(config.assets?.directory === './dist', 'assets.directory cần là ./dist.');
+    assert(config.main === 'src/worker.mjs', 'main cần là src/worker.mjs.');
+    assert(fs.existsSync(path.join(root, config.main)), 'Thiếu tệp Worker định tuyến.');
+    assert(config.assets.binding === 'ASSETS', 'Thiếu binding ASSETS.');
+    assert(config.assets.run_worker_first === true, 'Cần chạy Worker trước khi phục vụ assets.');
+  }
   assert(preview.name !== cfg.name, 'Tên Worker xem thử phải khác Worker chính.');
   const dist = path.resolve(root, cfg.assets.directory);
   const files = [];

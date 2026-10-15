@@ -15,9 +15,12 @@ repository/
 ├── wrangler.jsonc
 ├── .node-version
 ├── .gitignore
+├── src/
+│   └── worker.mjs
 ├── scripts/
 │   ├── check-site.mjs
-│   └── release.mjs
+│   ├── release.mjs
+│   └── worker.test.mjs
 └── dist/
     ├── index.html
     ├── styles.css
@@ -26,7 +29,7 @@ repository/
     └── assets/
 ```
 
-**Cần commit cả `dist/`**: đây là source HTML/CSS/JS của trang, đã sẵn sàng để phục vụ. Lệnh `npm run build` trong bộ này kiểm tra mã và đường dẫn ảnh; trang không cần biên dịch framework.
+**Cần commit cả `dist/`**: đây là source HTML/CSS/JS của trang, đã sẵn sàng để phục vụ. Lệnh `npm run build` kiểm tra mã, đường dẫn ảnh và định tuyến; trang không cần biên dịch framework.
 
 Giữ `.gitignore` đi kèm để bỏ qua `node_modules/` và bộ nhớ đệm. Bộ release không mang theo Git history hoặc cấu hình hosting riêng của bản xem ChatGPT.
 
@@ -40,7 +43,7 @@ Trong `wrangler.jsonc`, tên đã đặt là:
 
 Khi tạo Worker trên Cloudflare, dùng đúng tên này. Nếu kết nối vào Worker đã có, sửa `name` cho trùng tên Worker đó. Tên repository GitHub có thể khác tên Worker.
 
-`assets.directory` đã trỏ tới `./dist`; không cần thêm Worker script. Đây là cấu hình [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/binding/).
+`assets.directory` trỏ tới `./dist`; `src/worker.mjs` xử lý đường dẫn `/thiep-cuoi/` trước khi phục vụ các tệp tĩnh. Đây là cấu hình [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/binding/).
 
 ## 3. Kết nối GitHub trên Cloudflare
 
@@ -96,9 +99,20 @@ Những lần sau:
 | Không thấy repo trong danh sách | Kiểm tra repository access của Cloudflare Workers & Pages GitHub App |
 | Node version không đủ mới | Dùng Node 24; đã kèm `.node-version` cho build image |
 
-## 7. Gắn tên miền riêng
+## 7. Dùng /thiep-cuoi trên domain hiện tại
 
-Sau khi trang chạy ổn: mở Worker → **Settings → Domains & Routes → Add → Custom Domain**, nhập tên miền/subdomain thuộc zone Cloudflare đang hoạt động. Có thể tiếp tục dùng URL `workers.dev` nếu chưa cần tên miền. [Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/).
+URL chính của thiệp là **https://truongparker.io.vn/thiep-cuoi/**. Website hiện tại tiếp tục dùng hosting và bản ghi DNS hiện có.
+
+- Zone `truongparker.io.vn` phải đang hoạt động trong Cloudflare; bản ghi DNS của hostname này phải bật **Proxied** (mây cam).
+- `wrangler.jsonc` khai báo hai Route: `truongparker.io.vn/thiep-cuoi` và `truongparker.io.vn/thiep-cuoi/*`. Wrangler sẽ áp dụng chúng khi deploy. Không gắn toàn bộ hostname `truongparker.io.vn` làm Custom Domain của Worker thiệp cưới.
+- `src/worker.mjs` chuyển `/thiep-cuoi` sang `/thiep-cuoi/`, bỏ tiền tố khi đọc tệp từ `dist/`, và giữ các chuyển hướng tài nguyên bên trong đường dẫn thiệp. Dùng URL có dấu `/` cuối khi chia sẻ, kể cả khi thêm query string.
+- Bản production và preview vẫn phục vụ thiệp ở `/` trên URL `workers.dev`; preview không khai báo Route trên domain chính.
+- Sau khi push, xem **Deployments → View build history**. Kiểm tra **Settings → Domains & Routes** có đủ hai Route, rồi mở trang thiệp, CSS và ảnh trên domain.
+- Giữ **Build command** là `npm run build` và **Deploy command** là `npx wrangler deploy`. Nếu báo lỗi quyền sửa Route, kiểm tra API token của Workers Builds có quyền **Zone → Workers Routes → Edit** cho zone này.
+
+`npm run build` kiểm tra source và chạy các kiểm tra định tuyến. Có thể chạy riêng bằng `npm test`.
+
+Tham khảo: [Workers Routes](https://developers.cloudflare.com/workers/configuration/routing/routes/), [Static Assets binding](https://developers.cloudflare.com/workers/static-assets/binding/).
 
 ## 8. Quay lại bản ổn định
 

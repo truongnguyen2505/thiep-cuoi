@@ -1,10 +1,23 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "thiep-cuoi-duc-truong-thuy-quynh",
+  "main": "src/worker.mjs",
   "compatibility_date": "2026-10-15",
   "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "truongparker.io.vn/thiep-cuoi",
+      "zone_name": "truongparker.io.vn"
+    },
+    {
+      "pattern": "truongparker.io.vn/thiep-cuoi/*",
+      "zone_name": "truongparker.io.vn"
+    }
+  ],
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
     "not_found_handling": "none"
   }
 }
