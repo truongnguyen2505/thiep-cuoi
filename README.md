@@ -1,0 +1,116 @@
+# Release thiệp cưới: GitHub → Cloudflare Workers
+
+Bộ này chứa đầy đủ mã nguồn của thiệp Đức Trường & Thúy Quỳnh và cấu hình Workers Static Assets. Đã chuẩn bị cho luồng: **sửa source → commit/push GitHub → Cloudflare tự build → website cập nhật**.
+
+## 1. Đưa đúng bộ source lên GitHub
+
+Giải nén `CloudflareRelease.zip` vào `D:\ThiepMoiCuoiOnline\CloudflareRelease`. Đưa **nội dung bên trong** thư mục này vào thư mục gốc của repository. Có thể dùng GitHub Desktop nếu bạn quen giao diện.
+
+Repository nên có cấu trúc:
+
+```text
+repository/
+├── package.json
+├── package-lock.json
+├── wrangler.jsonc
+├── .node-version
+├── .gitignore
+├── scripts/
+│   ├── check-site.mjs
+│   └── release.mjs
+└── dist/
+    ├── index.html
+    ├── styles.css
+    ├── app.js
+    ├── config.js
+    └── assets/
+```
+
+**Cần commit cả `dist/`**: đây là source HTML/CSS/JS của trang, đã sẵn sàng để phục vụ. Lệnh `npm run build` trong bộ này kiểm tra mã và đường dẫn ảnh; trang không cần biên dịch framework.
+
+Giữ `.gitignore` đi kèm để bỏ qua `node_modules/` và bộ nhớ đệm. Bộ release không mang theo Git history hoặc cấu hình hosting riêng của bản xem ChatGPT.
+
+## 2. Kiểm tra tên Worker
+
+Trong `wrangler.jsonc`, tên đã đặt là:
+
+```json
+"name": "thiep-cuoi-duc-truong-thuy-quynh"
+```
+
+Khi tạo Worker trên Cloudflare, dùng đúng tên này. Nếu kết nối vào Worker đã có, sửa `name` cho trùng tên Worker đó. Tên repository GitHub có thể khác tên Worker.
+
+`assets.directory` đã trỏ tới `./dist`; không cần thêm Worker script. Đây là cấu hình [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/binding/).
+
+## 3. Kết nối GitHub trên Cloudflare
+
+Với Worker mới:
+
+1. Đăng nhập Cloudflare và mở **Workers & Pages**.
+2. Chọn **Create application → Import a repository → Get started**.
+3. Chọn GitHub, rồi chọn repository thiệp.
+4. Nếu cần kết nối GitHub App, cấp quyền cho repository thiệp bằng **Only select repositories**.
+5. Điền bảng cấu hình ở bước 4 bên dưới, rồi chọn **Save and Deploy**.
+
+Với Worker đã tồn tại: mở Worker đó → **Settings → Builds → Connect**, rồi chọn repository và cấu hình tương tự. Cloudflare yêu cầu tên Worker khớp `name` trong Wrangler. [Kết nối Worker mới/cũ](https://developers.cloudflare.com/workers/ci-cd/builds/), [quyền repository GitHub](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/).
+
+## 4. Điền các ô build
+
+| Ô trên Cloudflare | Giá trị cho bộ thiệp này |
+| --- | --- |
+| Worker name | `thiep-cuoi-duc-truong-thuy-quynh` |
+| Production branch / Git branch | `main`, hoặc đúng nhánh bạn dùng để phát hành |
+| Root directory | Để mặc định nếu `wrangler.jsonc` ở gốc repo |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Preview command, nếu bật branch previews | Giữ mặc định `npx wrangler preview` |
+
+Nếu bạn commit **cả thư mục `CloudflareRelease/`** vào repo thay vì đưa nội dung lên gốc, Root directory phải là `CloudflareRelease`. Không điền đường dẫn ổ D vào ô này. Root directory phải là thư mục chứa `package.json` và `wrangler.jsonc` trong repository.
+
+Không cần ô “Build output directory” cho cách deploy Workers này: vị trí `dist` đã nằm trong `wrangler.jsonc`. Không cần tự tạo GitHub Actions; Workers Builds xử lý quá trình build/deploy. Cloudflare có thể tạo token triển khai trong bước thiết lập Builds, không cần chạy `wrangler login` trên máy chỉ để dùng tích hợp Git. [Các trường cấu hình Builds](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/).
+
+## 5. Xem kết quả và cập nhật lần sau
+
+Khi deployment thành công, mở URL `workers.dev` mà Cloudflare cung cấp. Xem trên điện thoại và kiểm tra ảnh, tên hai gia đình, giờ tiệc, giờ làm lễ, nút chọn nhà trai/nhà gái, bản đồ và lịch.
+
+Những lần sau:
+
+1. Thay ảnh ở `dist/assets/`, cập nhật đường dẫn trong `dist/config.js` nếu đổi tên tệp.
+2. Sửa thông tin tại `dist/config.js`; sửa giao diện tại `dist/styles.css` hoặc `dist/index.html`.
+3. Commit và push lên nhánh production.
+4. Mở **Deployments → View build history** để theo dõi; kiểm tra website sau khi deployment thành công.
+
+Đã ẩn nút chỉnh thiệp trên bản gửi khách. Chỉnh ảnh/thông tin trong source rồi push sẽ cập nhật cho mọi khách. Thay đổi lưu riêng trong trình duyệt của bản mẫu không tự đi vào GitHub.
+
+Ảnh đi kèm là ảnh minh họa AI, chưa phải ảnh cưới của hai bạn. Phần sổ lưu bút/lời chúc đã được bỏ. Nút xác nhận tham dự đang ẩn; điền liên kết biểu mẫu vào `rsvpUrl` nếu muốn dùng.
+
+## 6. Nếu lần build đầu bị lỗi
+
+| Thông báo hoặc hiện tượng | Cách kiểm tra |
+| --- | --- |
+| Không tìm thấy `package.json` hoặc Wrangler config | Root directory chưa trỏ đúng thư mục |
+| Worker name mismatch | Sửa tên Worker hoặc `name` trong `wrangler.jsonc` cho giống nhau |
+| Missing script: build | Chưa commit `package.json` mới của bộ release này |
+| Thiếu `dist/index.html` | Chưa commit thư mục `dist` |
+| Ảnh 404 | Commit cả ảnh; tên và chữ hoa/thường phải khớp `config.js` |
+| Không thấy repo trong danh sách | Kiểm tra repository access của Cloudflare Workers & Pages GitHub App |
+| Node version không đủ mới | Dùng Node 24; đã kèm `.node-version` cho build image |
+
+## 7. Gắn tên miền riêng
+
+Sau khi trang chạy ổn: mở Worker → **Settings → Domains & Routes → Add → Custom Domain**, nhập tên miền/subdomain thuộc zone Cloudflare đang hoạt động. Có thể tiếp tục dùng URL `workers.dev` nếu chưa cần tên miền. [Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/).
+
+## 8. Quay lại bản ổn định
+
+Với luồng Git, cách dễ theo dõi là **revert commit gây lỗi rồi push** để source và website trở về cùng nội dung. Nếu cần phục hồi website ngay, dùng mục **Deployments** của Worker để chọn phiên bản ổn định và rollback; sau đó sửa/revert source trên GitHub trước lần push tiếp theo. [Rollbacks](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/).
+
+Các lệnh chạy từ máy Windows có trong `LENH-RELEASE-WINDOWS.md`. Ghi lại commit, deployment và URL mỗi lần phát hành theo `NHAT-KY-RELEASE.md`.
+
+## Tình trạng bộ đóng gói
+
+- Đã kiểm tra cú pháp JavaScript, ngày giờ, sự tồn tại và chữ hoa/thường của các đường dẫn ảnh.
+- Đã chạy thành công `wrangler deploy --dry-run` với Wrangler `4.151.0`.
+- Package lock đã cố định phụ thuộc; không kèm `node_modules`.
+- Bộ này chưa đăng nhập hoặc deploy vào tài khoản Cloudflare của bạn. Sau khi bạn kết nối GitHub và chọn Save and Deploy, Cloudflare mới phát hành trang trên tài khoản của bạn.
+
+Hướng dẫn được đối chiếu tài liệu Cloudflare ngày 15/10/2026.

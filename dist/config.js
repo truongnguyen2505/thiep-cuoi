@@ -1,6 +1,8 @@
 // Sửa trực tiếp tại đây hoặc dùng nút “Chỉnh thiệp” trên trang.
 window.WEDDING_CONFIG = {
   contentVersion: 'truong-quynh-2026-11-v2',
+  editorEnabled: false,
+  personalized: true,
   groom: 'Đức Trường', bride: 'Thúy Quỳnh',
   groomFull: 'Đức Trường', brideFull: 'Thúy Quỳnh',
   groomOrder: '', brideOrder: '',

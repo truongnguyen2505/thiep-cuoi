@@ -1,0 +1,21 @@
+{
+  "name": "thiep-cuoi-duc-truong-thuy-quynh",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bộ mã nguồn và quy trình release thiệp cưới lên Cloudflare Workers Static Assets",
+  "engines": { "node": ">=22.0.0" },
+  "scripts": {
+    "login": "wrangler login",
+    "whoami": "wrangler whoami",
+    "dev": "wrangler dev --ip 127.0.0.1",
+    "check": "node scripts/check-site.mjs",
+    "build": "node scripts/check-site.mjs",
+    "dry-run": "wrangler deploy --dry-run",
+    "release": "node scripts/release.mjs",
+    "deploy": "node scripts/release.mjs",
+    "release:preview": "node scripts/release.mjs --preview",
+    "versions": "wrangler versions list",
+    "rollback": "wrangler rollback"
+  },
+  "devDependencies": { "wrangler": "4.151.0" }
+}
