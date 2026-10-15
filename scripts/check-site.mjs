@@ -47,6 +47,8 @@ export function checkSite(root = projectRoot) {
   }
   const html = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
   for (const match of html.matchAll(/<(?:script|link|img)\b[^>]*\b(?:src|href)="([^"]+)"/gi)) localFile(match[1]);
+  const css = fs.readFileSync(path.join(dist, 'styles.css'), 'utf8');
+  for (const match of css.matchAll(/url\(\s*['"]?(assets\/fonts\/[^'")\s]+)['"]?\s*\)/g)) localFile(match[1]);
   for (const name of ['app.js', 'config.js']) {
     new vm.Script(fs.readFileSync(path.join(dist, name), 'utf8'), { filename: name });
   }

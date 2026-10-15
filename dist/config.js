@@ -1,6 +1,6 @@
 // Sửa trực tiếp tại đây hoặc dùng nút “Chỉnh thiệp” trên trang.
 window.WEDDING_CONFIG = {
-  contentVersion: 'truong-quynh-2026-11-v2',
+  contentVersion: 'truong-quynh-2026-11-v3',
   editorEnabled: false,
   personalized: true,
   groom: 'Đức Trường', bride: 'Thúy Quỳnh',
@@ -16,8 +16,18 @@ window.WEDDING_CONFIG = {
   brideVenue: 'Tư gia nhà gái', brideAddress: 'Thôn Lại Hoàng, xã Phù Đổng, TP. Hà Nội',
   groomParents: 'Ông Nguyễn Đức Thảo\nBà Vũ Thị Cúc', groomHometown: 'Thôn Yên Khê\nXã Phù Đổng, TP. Hà Nội',
   brideParents: 'Ông Đinh Văn Chiến\nBà Nguyễn Thị Luyến', brideHometown: 'Thôn Lại Hoàng\nXã Phù Đổng, TP. Hà Nội',
-  photos: ['assets/wedding-portrait.webp','assets/wedding-garden.webp'],
-  photoPositions: [45,50],
+  // Tạm dùng 2 ảnh minh họa cho 8 vị trí; thay từng đường dẫn bằng ảnh cưới của bạn.
+  photos: [
+    'assets/wedding-portrait.webp',
+    'assets/wedding-garden.webp',
+    'assets/wedding-portrait.webp',
+    'assets/wedding-garden.webp',
+    'assets/wedding-portrait.webp',
+    'assets/wedding-garden.webp',
+    'assets/wedding-portrait.webp',
+    'assets/wedding-garden.webp'
+  ],
+  photoPositions: [45, 50, 38, 56, 50, 42, 54, 48],
   schedule: [{date:'2026-11-23',time:'17:00',title:'Tiệc thân mật hai gia đình',icon:'glass'},{date:'2026-11-24',time:'09:00',title:'Lễ vu quy & lễ thành hôn',icon:'heart'}],
   rsvpUrl: '',
   groomBank: '', groomAccount: '', groomAccountName: '',
