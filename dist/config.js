@@ -33,6 +33,6 @@ window.WEDDING_CONFIG = {
   photoPositions: [45, 50, 38, 56, 50, 42, 54, 48],
   schedule: [{date:'2026-11-23',time:'17:00',title:'Tiệc thân mật hai gia đình',icon:'glass'},{date:'2026-11-23',time:'21:00',title:'Giao lưu họ nhà gái',icon:'music'},{date:'2026-11-24',time:'09:00',title:'Lễ vu quy & lễ thành hôn',icon:'heart'}],
   musicTitle: 'Ngày Đầu Tiên', musicArtist: 'Đức Phúc',
-  musicYoutubeId: 'rIXhXaQ8tiM',
+  musicYoutubeId: 'R6aQJWWWTy4',
   rsvpUrl: ''
 };
