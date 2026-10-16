@@ -629,6 +629,44 @@ body::after {
   opacity: .42;
   animation: botanical-drift 30s ease-in-out infinite alternate;
 }
+.petal-field {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.site-header,
+main {
+  position: relative;
+  z-index: 1;
+}
+.petal-field i {
+  position: absolute;
+  top: -14vh;
+  left: var(--x);
+  width: var(--size);
+  height: calc(var(--size) * 1.45);
+  border-radius: 78% 22% 72% 28% / 64% 35% 65% 36%;
+  background: linear-gradient(145deg, #e6c9bdcc, #f4e8d999 55%, #d8d7b880);
+  box-shadow: inset 1px 1px 2px #fff8;
+  opacity: var(--petal-opacity);
+  filter: blur(var(--blur));
+  transform-origin: 50% 100%;
+  animation: petal-fall var(--duration) linear var(--delay) infinite;
+  will-change: transform;
+}
+@keyframes petal-fall {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate(0deg) rotateY(0deg);
+  }
+  45% {
+    transform: translate3d(var(--drift), 48vh, 0) rotate(180deg) rotateY(105deg);
+  }
+  100% {
+    transform: translate3d(0, 120vh, 0) rotate(var(--spin)) rotateY(210deg);
+  }
+}
 @keyframes botanical-light {
   from { transform: translate3d(-1%, 1%, 0) scale(1); }
   to { transform: translate3d(2%, -2%, 0) scale(1.04); }
@@ -638,7 +676,8 @@ body::after {
   to { transform: translate3d(1%, -2%, 0) rotate(1deg); }
 }
 .page-hidden body::before,
-.page-hidden body::after {
+.page-hidden body::after,
+.page-hidden .petal-field i {
   animation-play-state: paused;
 }
 
@@ -673,6 +712,20 @@ body::after {
 @keyframes photo-focus {
   from { opacity: .35; transform: scale(1.06); }
   to { opacity: 1; transform: scale(1); }
+}
+.envelope-photos {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  animation: envelope-photos-float 4.8s ease-in-out infinite;
+  will-change: transform;
+}
+.page-hidden .envelope-photos {
+  animation-play-state: paused;
+}
+@keyframes envelope-photos-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
 }
 .polaroid {
   overflow: hidden;
@@ -794,6 +847,9 @@ body::after {
   background: #eef0e4;
 }
 @media (prefers-reduced-motion: reduce) {
+  .petal-field {
+    display: none;
+  }
   body::before,
   body::after {
     animation: none;
