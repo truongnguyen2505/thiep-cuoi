@@ -772,10 +772,12 @@ main {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.music-copy a {
+.music-copy a,
+.music-copy small {
   width: fit-content;
   margin-top: 4px;
   font-size: 11px;
+  font-weight: 400;
   opacity: .72;
 }
 #music-toggle {
@@ -806,18 +808,7 @@ main {
   background: #596d49;
 }
 #music-source {
-  position: fixed;
-  left: -9999px;
-  top: -9999px;
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
-  pointer-events: none;
-}
-#music-source iframe {
-  width: 200px;
-  height: 200px;
-  border: 0;
+  display: none;
 }
 @keyframes music-disc-spin {
   to { transform: rotate(360deg); }

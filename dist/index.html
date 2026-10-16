@@ -113,9 +113,9 @@
   </main>
   <aside class="music-player" id="music-player" aria-label="Trình phát nhạc nền">
     <span class="music-disc" aria-hidden="true">♫</span>
-    <span class="music-copy"><strong data-bind="musicTitle">Ngày Đầu Tiên</strong><a href="https://www.youtube.com/watch?v=R6aQJWWWTy4" target="_blank" rel="noopener"><span data-bind="musicArtist">Đức Phúc</span> · MV chính thức</a></span>
+    <span class="music-copy"><strong data-bind="musicTitle">Ngày Đầu Tiên</strong><small><span data-bind="musicArtist">Đức Phúc</span> · Nhạc nền</small></span>
     <button type="button" id="music-toggle" aria-label="Phát nhạc Ngày Đầu Tiên" aria-pressed="false"><span class="music-toggle-icon" aria-hidden="true">▶</span><span class="music-toggle-label">Phát nhạc</span></button>
-    <div id="music-source" aria-hidden="true"></div>
+    <audio id="music-source" src="assets/ngay_dau_tien.mp3" preload="auto" autoplay loop playsinline></audio>
   </aside>
   <div class="toast" id="toast" role="status"></div>
   <dialog id="lightbox" class="lightbox"><button class="dialog-close" data-close aria-label="Đóng ảnh">×</button><button class="lightbox-prev" id="lightbox-prev" aria-label="Ảnh trước">←</button><img id="lightbox-img" alt="Ảnh cưới phóng to"><button class="lightbox-next" id="lightbox-next" aria-label="Ảnh tiếp theo">→</button><span id="lightbox-counter" role="status" aria-live="polite"></span></dialog>

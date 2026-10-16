@@ -326,33 +326,26 @@
     document.documentElement.classList.toggle('page-hidden', document.hidden);
     if(!document.hidden&&musicWantsPlay)playMusic();
   });
-  const musicToggle=$('#music-toggle'),musicShell=$('#music-player');
-  let youtubeMusicPlayer=null,musicWantsPlay=true,musicPlaying=false;
+  const musicToggle=$('#music-toggle'),musicShell=$('#music-player'),musicAudio=$('#music-source');
+  let musicWantsPlay=true,musicPlaying=false;
   function syncMusicButton(playing){musicPlaying=playing;musicShell?.classList.toggle('is-playing',playing);if(!musicToggle)return;const icon=musicToggle.querySelector('.music-toggle-icon'),label=musicToggle.querySelector('.music-toggle-label');if(icon)icon.textContent=playing?'Ⅱ':'▶';if(label)label.textContent=playing?'Dừng nhạc':'Phát nhạc';musicToggle.setAttribute('aria-pressed',String(playing));musicToggle.setAttribute('aria-label',(playing?'Dừng ':'Phát ')+(config.musicTitle||'nhạc nền'));}
-  function playMusic(){musicWantsPlay=true;if(!youtubeMusicPlayer)return;try{youtubeMusicPlayer.setVolume(38);youtubeMusicPlayer.playVideo();}catch{}}
-  function pauseMusic(){musicWantsPlay=false;try{youtubeMusicPlayer?.pauseVideo();}catch{}syncMusicButton(false);}
+  async function playMusic(){musicWantsPlay=true;if(!musicAudio)return;musicAudio.volume=.38;try{await musicAudio.play();}catch{syncMusicButton(false);}}
+  function pauseMusic(){musicWantsPlay=false;musicAudio?.pause();syncMusicButton(false);}
   function initMusicPlayer(){
-    if(!musicToggle||!musicShell||!config.musicYoutubeId){if(musicShell)musicShell.hidden=true;return;}
+    if(!musicToggle||!musicShell||!musicAudio||!config.musicFile){if(musicShell)musicShell.hidden=true;return;}
+    musicAudio.src=config.musicFile;
+    musicAudio.volume=.38;
+    musicAudio.addEventListener('play',()=>syncMusicButton(true));
+    musicAudio.addEventListener('pause',()=>syncMusicButton(false));
+    musicAudio.addEventListener('ended',()=>{if(musicWantsPlay)playMusic();});
+    musicAudio.addEventListener('error',()=>{syncMusicButton(false);musicToggle.title='Không thể tải file nhạc nền.';});
     musicToggle.addEventListener('click',()=>musicPlaying?pauseMusic():playMusic());
     const unlock=event=>{if(event.target.closest?.('#music-toggle'))return;playMusic();document.removeEventListener('pointerdown',unlock,true);};
     document.addEventListener('pointerdown',unlock,true);
     document.addEventListener('keydown',()=>playMusic(),{once:true});
     window.addEventListener('pageshow',()=>{if(musicWantsPlay)playMusic();});
     window.addEventListener('focus',()=>{if(musicWantsPlay)playMusic();});
-    window.onYouTubeIframeAPIReady=()=>{
-      youtubeMusicPlayer=new window.YT.Player('music-source',{
-        videoId:config.musicYoutubeId,
-        width:200,
-        height:200,
-        playerVars:{autoplay:1,loop:1,playlist:config.musicYoutubeId,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,origin:location.origin},
-        events:{
-          onReady:event=>{event.target.setVolume(38);if(musicWantsPlay)event.target.playVideo();},
-          onStateChange:event=>{const state=window.YT.PlayerState,wasPlaying=musicPlaying,playing=event.data===state.PLAYING;syncMusicButton(playing);if((event.data===state.ENDED||(event.data===state.PAUSED&&wasPlaying))&&musicWantsPlay)setTimeout(()=>playMusic(),350);},
-          onError:()=>{syncMusicButton(false);musicToggle.title='Không thể phát nhạc. Bạn có thể mở MV chính thức từ tên nghệ sĩ.';}
-        }
-      });
-    };
-    const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.async=true;document.head.append(script);
+    playMusic();
   }
   function download(data,name,type){const blob=new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
   const safeURL=value=>{try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:null;}catch{return null;}};
