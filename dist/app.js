@@ -324,7 +324,36 @@
   });
   document.addEventListener('visibilitychange', () => {
     document.documentElement.classList.toggle('page-hidden', document.hidden);
+    if(!document.hidden&&musicWantsPlay)playMusic();
   });
+  const musicToggle=$('#music-toggle'),musicShell=$('#music-player');
+  let youtubeMusicPlayer=null,musicWantsPlay=true,musicPlaying=false;
+  function syncMusicButton(playing){musicPlaying=playing;musicShell?.classList.toggle('is-playing',playing);if(!musicToggle)return;const icon=musicToggle.querySelector('.music-toggle-icon'),label=musicToggle.querySelector('.music-toggle-label');if(icon)icon.textContent=playing?'Ⅱ':'▶';if(label)label.textContent=playing?'Dừng nhạc':'Phát nhạc';musicToggle.setAttribute('aria-pressed',String(playing));musicToggle.setAttribute('aria-label',(playing?'Dừng ':'Phát ')+(config.musicTitle||'nhạc nền'));}
+  function playMusic(){musicWantsPlay=true;if(!youtubeMusicPlayer)return;try{youtubeMusicPlayer.setVolume(38);youtubeMusicPlayer.playVideo();}catch{}}
+  function pauseMusic(){musicWantsPlay=false;try{youtubeMusicPlayer?.pauseVideo();}catch{}syncMusicButton(false);}
+  function initMusicPlayer(){
+    if(!musicToggle||!musicShell||!config.musicYoutubeId){if(musicShell)musicShell.hidden=true;return;}
+    musicToggle.addEventListener('click',()=>musicPlaying?pauseMusic():playMusic());
+    const unlock=event=>{if(event.target.closest?.('#music-toggle'))return;playMusic();document.removeEventListener('pointerdown',unlock,true);};
+    document.addEventListener('pointerdown',unlock,true);
+    document.addEventListener('keydown',()=>playMusic(),{once:true});
+    window.addEventListener('pageshow',()=>{if(musicWantsPlay)playMusic();});
+    window.addEventListener('focus',()=>{if(musicWantsPlay)playMusic();});
+    window.onYouTubeIframeAPIReady=()=>{
+      youtubeMusicPlayer=new window.YT.Player('music-source',{
+        videoId:config.musicYoutubeId,
+        width:200,
+        height:200,
+        playerVars:{autoplay:1,loop:1,playlist:config.musicYoutubeId,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,origin:location.origin},
+        events:{
+          onReady:event=>{event.target.setVolume(38);if(musicWantsPlay)event.target.playVideo();},
+          onStateChange:event=>{const state=window.YT.PlayerState,wasPlaying=musicPlaying,playing=event.data===state.PLAYING;syncMusicButton(playing);if((event.data===state.ENDED||(event.data===state.PAUSED&&wasPlaying))&&musicWantsPlay)setTimeout(()=>playMusic(),350);},
+          onError:()=>{syncMusicButton(false);musicToggle.title='Không thể phát nhạc. Bạn có thể mở MV chính thức từ tên nghệ sĩ.';}
+        }
+      });
+    };
+    const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.async=true;document.head.append(script);
+  }
   function download(data,name,type){const blob=new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
   const safeURL=value=>{try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:null;}catch{return null;}};
   $('#rsvp-open').addEventListener('click',()=>{const url=safeURL(config.rsvpUrl);if(url){window.open(url,'_blank','noopener,noreferrer');return;}modal('#rsvp-dialog');});
@@ -376,5 +405,6 @@
   if($('#edit-open')&&config.editorEnabled!==false){$('#edit-open').addEventListener('click',()=>{fillEditor();modal('#editor-dialog');});$('#editor-form').addEventListener('submit',async e=>{e.preventDefault();if(await applyEditor())toast('Đã lưu thiệp của hai bạn ♡');});$('#export-site').addEventListener('click',exportSite);$('#reset-template').addEventListener('click',async()=>{if(!window.confirm('Khôi phục thông tin ban đầu? Ảnh và thông tin bạn đã thay sẽ được gỡ khỏi bản lưu trên trình duyệt.'))return;try{await saveConfig(base);}catch{}config=structuredClone(base);albumIndex=0;render();fillEditor();toast('Đã khôi phục thông tin ban đầu.');});}
   render();
   initPhotoMotion();
+  initMusicPlayer();
   if(!base.personalized)readConfig().then(saved=>{if(saved&&Array.isArray(saved.photos)&&saved.photos.length){config={...config,...saved};render();}});
 })();
