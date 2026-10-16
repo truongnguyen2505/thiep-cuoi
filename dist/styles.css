@@ -243,7 +243,7 @@ body {
   letter-spacing: .05em;
 }
 .hero .hero-eyebrow {
-  font-size: clamp(14px, 4vw, 19.2px);
+  font-size: clamp(17px, 4.8vw, 23.04px);
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: .16em;
@@ -255,6 +255,17 @@ body {
   font-style: normal;
   line-height: 1.5;
   letter-spacing: .08em;
+}
+.hero-date {
+  font-size: clamp(15px, 4.266667vw, 20.48px);
+  font-weight: 700;
+}
+.hero-reception-date {
+  font-size: clamp(13px, 3.733333vw, 17.92px);
+  opacity: .95;
+}
+.hero-reception-date [data-bind] {
+  font-weight: 700;
 }
 .scroll-cue,
 .back-top {
@@ -349,22 +360,23 @@ body {
 .ceremony-details > strong,
 .reception-time {
   font-family: var(--serif);
-  font-size: var(--type-title);
-  font-weight: 400;
+  font-size: clamp(22px, 6.4vw, 30.72px);
+  font-weight: 700;
   line-height: 1.5;
 }
 .date-divider span {
-  font-size: var(--type-detail);
-  font-weight: 400;
+  font-size: clamp(13px, 3.733333vw, 17.92px);
+  font-weight: 700;
   line-height: 1.4;
 }
 .date-divider strong {
   font-family: var(--serif);
-  font-size: var(--type-day);
-  font-weight: 400;
+  font-size: clamp(33px, 9.6vw, 46.08px);
+  font-weight: 700;
 }
 .year {
-  font-size: var(--type-year);
+  font-size: clamp(19px, 5.333333vw, 25.6px);
+  font-weight: 700;
   line-height: 1.5;
 }
 .lunar-date {
@@ -405,6 +417,7 @@ body {
 }
 .reception-venue {
   font-size: var(--type-year);
+  font-weight: 700;
   font-style: normal;
   line-height: 1.5;
 }
@@ -480,7 +493,8 @@ body {
   letter-spacing: .08em;
 }
 .timeline-time {
-  font-size: var(--type-lead);
+  font-size: clamp(17px, 4.8vw, 23.04px);
+  font-weight: 700;
   line-height: 1.4;
 }
 .timeline-name {
@@ -529,7 +543,9 @@ body {
 }
 .footer-date {
   font-family: var(--serif);
-  font-size: var(--type-small);
+  font-size: var(--type-detail);
+  font-weight: 700;
+  opacity: .95;
   line-height: 1.5;
   letter-spacing: .12em;
 }
@@ -702,6 +718,27 @@ main {
   opacity: 1;
   translate: 0 0;
 }
+
+/* Reveal names and key text as each line enters the viewport. */
+.text-motion-ready .reveal-text {
+  opacity: 0;
+  translate: 0 22px;
+  transition: opacity .8s ease var(--text-reveal-delay, 0s),
+    translate .8s cubic-bezier(.2, .7, .2, 1) var(--text-reveal-delay, 0s);
+}
+.text-motion-ready .reveal-text.is-text-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+#couple-names > [data-bind="bride"] {
+  --text-reveal-delay: .16s;
+}
+.hero-date {
+  --text-reveal-delay: .2s;
+}
+.hero-reception-date {
+  --text-reveal-delay: .28s;
+}
 .motion-ready .envelope-scene.is-visible .polaroid {
   animation: polaroid-arrive 1.1s cubic-bezier(.2,.7,.2,1) both;
 }
@@ -735,36 +772,94 @@ main {
   50% { transform: translate3d(0, -8px, 0); }
 }
 .music-player {
+  --music-size: 56px;
+  --music-expanded-width: min(342px, calc(100vw - 28px));
   position: fixed;
-  right: max(14px, calc((100vw - 480px) / 2 + 14px));
+  right: max(14px, env(safe-area-inset-right));
   bottom: max(14px, env(safe-area-inset-bottom));
   z-index: 90;
-  width: min(342px, calc(100vw - 28px));
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
+  width: var(--music-size);
+  height: var(--music-size);
+  overflow: hidden;
   color: #536443;
-  background: #fafaf4e8;
-  border: 1px solid #cfd7c2;
+  background-color: transparent;
+  border: 1px solid transparent;
   border-radius: 30px;
+  transition: width .48s cubic-bezier(.22, .8, .24, 1),
+    background-color .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+.music-player.is-expanded {
+  width: var(--music-expanded-width);
+  background-color: #fafaf4f5;
+  border-color: #cfd7c2;
   box-shadow: 0 8px 28px #34452824;
   backdrop-filter: blur(12px);
 }
+.music-controls {
+  position: absolute;
+  top: 0;
+  right: calc(var(--music-size) - 2px);
+  bottom: 0;
+  width: calc(var(--music-expanded-width) - var(--music-size));
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 7px 5px 7px 14px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(16px);
+  transition: opacity .2s ease, transform .4s ease, visibility 0s linear .48s;
+}
+.music-player.is-expanded .music-controls {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
+  transition-delay: .1s, .05s, 0s;
+}
+.music-disc-toggle {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  padding: 3px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+.music-disc-toggle:focus-visible {
+  outline: 2px solid var(--olive-dark);
+  outline-offset: -2px;
+}
+.music-disc-toggle:hover .music-disc {
+  filter: brightness(1.1);
+}
 .music-disc {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: #fffdf4;
-  background: radial-gradient(circle at center,#d9c17d 0 12%,#778b63 13% 47%,#647653 48% 53%,#84976d 54%);
-  box-shadow: 0 2px 8px #4253352b;
+  color: #f9f5df;
+  background:
+    conic-gradient(from 35deg, transparent, #e1e7d64d 15%, transparent 32% 62%, #e1e7d63d 78%, transparent),
+    radial-gradient(circle, #bca56b 0 21%, #83966a 22% 29%, #405036 30% 43%, #728060 44% 46%, #405036 47% 59%, #728060 60% 62%, #4e6040 63%);
+  box-shadow: 0 2px 5px #42533538, inset 0 0 0 1px #9eaf86;
+  animation: music-disc-spin 8s linear infinite;
+  animation-play-state: paused;
+  transition: filter .2s ease;
+}
+.music-disc svg {
+  width: 17px;
+  height: 17px;
 }
 .music-player.is-playing .music-disc {
-  animation: music-disc-spin 8s linear infinite;
+  animation-play-state: running;
 }
 .music-copy {
   min-width: 0;
@@ -788,31 +883,30 @@ main {
   opacity: .72;
 }
 #music-toggle {
-  min-width: 92px;
-  height: 38px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 0 12px;
+  padding: 0;
   border: 1px solid #80936b;
-  border-radius: 20px;
+  border-radius: 50%;
   color: #fffef7;
   background: #70835d;
   font-size: 14px;
   line-height: 1;
 }
 .music-toggle-icon {
-  width: 12px;
-  font-size: 13px;
-}
-.music-toggle-label {
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
+  font-size: 16px;
+  line-height: 1;
 }
 #music-toggle:hover {
   background: #596d49;
+}
+#music-toggle:focus-visible {
+  outline-offset: 1px;
 }
 #music-source {
   display: none;
@@ -960,5 +1054,315 @@ main {
   }
   .album-track {
     scroll-behavior: auto;
+  }
+  .text-motion-ready .reveal-text {
+    opacity: 1;
+    translate: 0 0;
+    transition: none;
+  }
+  .music-player,
+  .music-controls,
+  .music-disc {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Full-screen invitation envelope shown before the wedding content. */
+body.invitation-locked {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.invitation-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden;
+  color: #536443;
+  background: #f4f0e3;
+  perspective: 1200px;
+  isolation: isolate;
+}
+.invitation-gate-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(50% + 1px);
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent, #84976d12),
+    radial-gradient(circle at 50% 18%, #fffef8 0 5%, transparent 34%),
+    linear-gradient(145deg, #f9f6eb 0%, #eee8d8 55%, #e6deca 100%);
+  box-shadow: inset 0 0 60px #778b6320;
+  transition: transform 1.05s cubic-bezier(.7, 0, .2, 1) .25s,
+    box-shadow .7s ease .15s;
+  will-change: transform;
+}
+.invitation-gate-panel::before,
+.invitation-gate-panel::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+.invitation-gate-panel::before {
+  top: 9%;
+  bottom: 9%;
+  width: min(72vw, 520px);
+  border: 1px solid #8798722e;
+  border-radius: 50%;
+}
+.invitation-gate-panel::after {
+  width: min(64vw, 430px);
+  height: min(64vw, 430px);
+  opacity: .26;
+  background:
+    radial-gradient(ellipse at 44% 18%, transparent 0 52%, #8ba074 53% 54%, transparent 55%),
+    radial-gradient(ellipse at 36% 31%, #afbd994d 0 9%, transparent 10%),
+    radial-gradient(ellipse at 62% 51%, #d2c89d66 0 8%, transparent 9%),
+    radial-gradient(ellipse at 42% 72%, #91a37b4d 0 10%, transparent 11%);
+}
+.invitation-gate-panel-left {
+  left: 0;
+  border-right: 1px solid #7a8d6642;
+  transform-origin: left center;
+}
+.invitation-gate-panel-left::before {
+  right: -58%;
+}
+.invitation-gate-panel-left::after {
+  left: -24%;
+  bottom: -8%;
+  rotate: 24deg;
+}
+.invitation-gate-panel-right {
+  right: 0;
+  border-left: 1px solid #fffdf099;
+  transform-origin: right center;
+}
+.invitation-gate-panel-right::before {
+  left: -58%;
+}
+.invitation-gate-panel-right::after {
+  right: -24%;
+  top: -8%;
+  rotate: 204deg;
+}
+.invitation-gate-card {
+  position: relative;
+  z-index: 2;
+  width: min(88vw, 390px);
+  padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+  text-align: center;
+  filter: drop-shadow(0 12px 24px #46543718);
+  animation: invitation-card-arrive .9s cubic-bezier(.2, .72, .2, 1) backwards;
+  transition: opacity .38s ease .18s, transform .55s ease .1s, filter .4s ease;
+}
+.invitation-gate-kicker,
+.invitation-gate-date,
+.invitation-gate-hint {
+  font-family: var(--sans);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.invitation-gate-kicker {
+  margin: 0 0 13px;
+  font-size: clamp(9px, 2.5vw, 11px);
+  font-weight: 700;
+}
+.invitation-gate-card h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  color: #4f6241;
+  font-family: var(--script);
+  font-size: clamp(37px, 11vw, 54px);
+  font-weight: 400;
+  line-height: .95;
+  text-wrap: balance;
+}
+.invitation-gate-card h1 span {
+  display: inline-block;
+}
+.invitation-gate-card h1 em {
+  color: #a68e52;
+  font-family: var(--serif);
+  font-size: .56em;
+  font-weight: 400;
+}
+.invitation-gate-date {
+  margin: 15px 0 23px;
+  color: #71805f;
+  font-size: clamp(11px, 3.2vw, 13px);
+  font-weight: 700;
+}
+.invitation-gate-envelope {
+  position: relative;
+  width: min(72vw, 286px);
+  height: min(43vw, 174px);
+  min-height: 146px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #71835e5c;
+  border-radius: 4px;
+  background: linear-gradient(160deg, #f8f3e5, #ded5bf);
+  box-shadow: 0 15px 30px #48563822, inset 0 0 20px #fff9;
+}
+.invitation-gate-envelope::before,
+.invitation-gate-envelope::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.invitation-gate-envelope::before {
+  z-index: 0;
+  background: #e4dcc8;
+  clip-path: polygon(0 0, 50% 62%, 100% 0);
+  filter: drop-shadow(0 2px 1px #5b68452b);
+}
+.invitation-gate-envelope::after {
+  z-index: 2;
+  background: linear-gradient(175deg, #eee8d8, #d9ceb7);
+  clip-path: polygon(0 100%, 0 38%, 50% 72%, 100% 38%, 100% 100%);
+}
+.invitation-gate-flap {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  width: 52%;
+  background: linear-gradient(145deg, #f4eedf, #dfd5bf);
+  transition: transform .58s cubic-bezier(.65, 0, .25, 1), opacity .38s ease .1s;
+  will-change: transform;
+}
+.invitation-gate-flap-left {
+  left: 0;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  transform-origin: left center;
+}
+.invitation-gate-flap-right {
+  right: 0;
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  transform-origin: right center;
+}
+.invitation-open-button {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  width: 92px;
+  min-height: 92px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  margin: -119px auto 58px;
+  padding: 9px;
+  border: 0;
+  border-radius: 50%;
+  color: #fffdf5;
+  background:
+    radial-gradient(circle at 35% 28%, #91a178 0 8%, transparent 9%),
+    radial-gradient(circle at 50% 50%, #7e9169 0 58%, #657a53 59% 67%, #9baa84 68% 71%, transparent 72%);
+  box-shadow: 0 8px 18px #3c4d303f, inset 0 2px 2px #ffffff52;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .11em;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform .25s ease, filter .25s ease, opacity .25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.invitation-open-button:hover {
+  filter: brightness(1.06);
+  transform: scale(1.045);
+}
+.invitation-open-button:active {
+  transform: scale(.96);
+}
+.invitation-open-button:focus-visible {
+  outline: 3px solid #fffdf5;
+  outline-offset: 5px;
+  box-shadow: 0 0 0 8px #657a53, 0 8px 18px #3c4d303f;
+}
+.invitation-wax-seal {
+  display: block;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: .8;
+}
+.invitation-gate-hint {
+  margin: 0;
+  color: #6f7c5f;
+  font-size: clamp(8px, 2.3vw, 10px);
+  letter-spacing: .08em;
+  line-height: 1.5;
+  text-transform: none;
+}
+.invitation-gate.is-opening {
+  background: transparent;
+}
+.invitation-gate.is-opening .invitation-gate-flap-left {
+  opacity: .38;
+  transform: translateX(-108%) rotateY(-24deg);
+}
+.invitation-gate.is-opening .invitation-gate-flap-right {
+  opacity: .38;
+  transform: translateX(108%) rotateY(24deg);
+}
+.invitation-gate.is-opening .invitation-open-button {
+  opacity: 0;
+  transform: scale(.72);
+}
+.invitation-gate.is-opening .invitation-gate-card {
+  animation: none;
+  opacity: 0;
+  filter: blur(3px);
+  transform: scale(.95);
+}
+.invitation-gate.is-opening .invitation-gate-panel-left {
+  box-shadow: 20px 0 50px #29351e24;
+  transform: translateX(-103%) rotateY(-6deg);
+}
+.invitation-gate.is-opening .invitation-gate-panel-right {
+  box-shadow: -20px 0 50px #29351e24;
+  transform: translateX(103%) rotateY(6deg);
+}
+@keyframes invitation-card-arrive {
+  from { opacity: 0; transform: translateY(16px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 380px) {
+  .invitation-gate-card h1 {
+    flex-direction: column;
+    gap: 0;
+    font-size: 39px;
+    line-height: .78;
+  }
+  .invitation-gate-card h1 em {
+    margin: 8px 0;
+  }
+  .invitation-gate-date {
+    margin-bottom: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .invitation-gate-card {
+    animation: none;
+  }
+  .invitation-gate-panel,
+  .invitation-gate-card,
+  .invitation-gate-flap,
+  .invitation-open-button {
+    transition-duration: .01ms;
+    transition-delay: 0s;
   }
 }

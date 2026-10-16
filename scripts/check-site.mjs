@@ -46,6 +46,9 @@ export function checkSite(root = projectRoot) {
     assert(fs.statSync(current).isFile(), 'Không phải tệp: ' + ref);
   }
   const html = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
+  assert(/<body\s+class="invitation-locked">/.test(html), 'Trang cần được khóa trước khi khách mở thiệp.');
+  assert(/id="invitation-gate"/.test(html), 'Thiếu màn hình phong thư mở thiệp.');
+  assert(/id="invitation-open"/.test(html), 'Thiếu nút mở thiệp.');
   for (const match of html.matchAll(/<(?:script|link|img)\b[^>]*\b(?:src|href)="([^"]+)"/gi)) localFile(match[1]);
   const css = fs.readFileSync(path.join(dist, 'styles.css'), 'utf8');
   for (const match of css.matchAll(/url\(\s*['"]?(assets\/fonts\/[^'")\s]+)['"]?\s*\)/g)) localFile(match[1]);

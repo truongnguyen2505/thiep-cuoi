@@ -13,11 +13,69 @@
   const albumTrack = $('#album-track');
   let albumCards = [], albumDots = [], albumSignature = '', albumFrame = 0;
   let albumScrollTimer, requestedAlbumIndex = null, albumGesture = null, suppressAlbumClick = false;
-  let photoObserver, lightboxRequest = 0, lightboxAnimation;
+  let photoObserver, textObserver, lightboxRequest = 0, lightboxAnimation;
   const watchedImages = new WeakSet();
   function toast(message) {const e=$('#toast');e.textContent=message;e.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>e.classList.remove('show'),4200);}
   function modal(id) {const e=$(id);if(!e)return;e.showModal();document.body.classList.add('modal-open');}
   function closeDialog(e) {e.close();document.body.classList.remove('modal-open');}
+  const invitationGate = $('#invitation-gate');
+  let invitationGateTargets = [], invitationGateTimer;
+  function setInvitationContentLocked(locked) {
+    invitationGateTargets.forEach(element => { element.inert = locked; });
+  }
+  function finishInvitationOpen() {
+    clearTimeout(invitationGateTimer);
+    if (!invitationGate) return;
+    invitationGate.hidden = true;
+    invitationGate.classList.remove('is-opening');
+    invitationGate.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('invitation-locked', 'invitation-opening');
+    setInvitationContentLocked(false);
+    initTextMotion();
+    const main = $('#home');
+    if (main) {
+      main.setAttribute('tabindex', '-1');
+      main.focus({ preventScroll: true });
+      setTimeout(() => main.removeAttribute('tabindex'), 0);
+    }
+  }
+  function openInvitation() {
+    const button = $('#invitation-open');
+    if (!invitationGate || invitationGate.classList.contains('is-opening')) return;
+    window.scrollTo(0, 0);
+    button.disabled = true;
+    invitationGate.classList.add('is-opening');
+    document.body.classList.add('invitation-opening');
+    playMusic();
+    if (motionPreference.matches) {
+      invitationGateTimer = setTimeout(finishInvitationOpen, 30);
+      return;
+    }
+    const panel = $('.invitation-gate-panel-left', invitationGate);
+    const finishOnPanel = event => {
+      if (event.propertyName !== 'transform') return;
+      panel.removeEventListener('transitionend', finishOnPanel);
+      finishInvitationOpen();
+    };
+    panel?.addEventListener('transitionend', finishOnPanel);
+    invitationGateTimer = setTimeout(finishInvitationOpen, 1500);
+  }
+  function initInvitationGate() {
+    if (!invitationGate) {
+      document.body.classList.remove('invitation-locked');
+      return;
+    }
+    const button = $('#invitation-open');
+    invitationGateTargets = [...document.body.children].filter(element => element !== invitationGate);
+    invitationGate.hidden = false;
+    invitationGate.classList.remove('is-opening');
+    invitationGate.removeAttribute('aria-hidden');
+    document.body.classList.add('invitation-locked');
+    setInvitationContentLocked(true);
+    button.disabled = false;
+    button.addEventListener('click', openInvitation);
+    requestAnimationFrame(() => button.focus({ preventScroll: true }));
+  }
   $$('dialog').forEach(d => {d.addEventListener('close',()=>document.body.classList.remove('modal-open'));d.addEventListener('click',e=>{if(e.target===d && d.id!=='lightbox'){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog(d);}});});
   $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeDialog(b.closest('dialog'))));
   function openDB() {return new Promise((resolve,reject)=>{const req=indexedDB.open(key,1);req.onupgradeneeded=()=>req.result.createObjectStore('settings');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
@@ -37,6 +95,7 @@
     $('#rsvp-open').hidden=!safeURL(config.rsvpUrl);
     if(config.editorEnabled===false)document.body.classList.add('hide-editor');
     preparePageImages();
+    initTextMotion();
   }
   function dateValues(value){const d=new Date(value+'T12:00:00+07:00');return {day:d.getUTCDate(),monthLabel:'THÁNG '+(d.getUTCMonth()+1),year:d.getUTCFullYear(),weekday:['CHỦ NHẬT','THỨ HAI','THỨ BA','THỨ TƯ','THỨ NĂM','THỨ SÁU','THỨ BẢY'][d.getUTCDay()],heroDate:String(d.getUTCDate()).padStart(2,'0')+' . '+String(d.getUTCMonth()+1).padStart(2,'0')+' . '+d.getUTCFullYear()};}
   function shortDate(value){return value.split('-').reverse().join('.');}
@@ -312,11 +371,41 @@
     }, { threshold: .08, rootMargin: '0px 0px -5% 0px' });
     frames.forEach(frame => photoObserver.observe(frame));
   }
+  function initTextMotion() {
+    textObserver?.disconnect();
+    const elements = $$(
+      'main .eyebrow, #couple-names > [data-bind], .hero-date, .hero-reception-date, ' +
+      'main .section-title, main .display-title, .formal-copy, .formal-name, ' +
+      '.ceremony-details, .date-divider, .year, .lunar-date, .ceremony-venues h3, ' +
+      '.reception-intro, .reception-time, .reception-venue, .venue-address, ' +
+      '.timeline-row, .thank-you, .footer-couple, .footer-date'
+    );
+    const enabled = !motionPreference.matches && typeof IntersectionObserver === 'function';
+    document.documentElement.classList.toggle('text-motion-ready', enabled);
+    elements.forEach(element => {
+      element.classList.add('reveal-text');
+      if (!enabled) element.classList.add('is-text-visible');
+    });
+    // The hero should animate after the envelope opens, not behind its cover.
+    if (!enabled || (invitationGate && !invitationGate.hidden)) return;
+    textObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-text-visible');
+        textObserver.unobserve(entry.target);
+      });
+    }, { threshold: .12, rootMargin: '0px 0px -24px 0px' });
+    elements.forEach(element => {
+      if (!element.classList.contains('is-text-visible')) textObserver.observe(element);
+    });
+  }
   document.addEventListener('focusin', event => {
     event.target.closest?.('.reveal-frame')?.classList.add('is-visible');
+    event.target.closest?.('.reveal-text')?.classList.add('is-text-visible');
   });
   motionPreference.addEventListener?.('change', () => {
     initPhotoMotion();
+    initTextMotion();
     if (motionPreference.matches) {
       lightboxAnimation?.cancel();
       scrollAlbumTo(albumIndex, 'auto');
@@ -327,22 +416,66 @@
     if(!document.hidden&&musicWantsPlay)playMusic();
   });
   const musicToggle=$('#music-toggle'),musicShell=$('#music-player'),musicAudio=$('#music-source');
-  let musicWantsPlay=true,musicPlaying=false;
-  function syncMusicButton(playing){musicPlaying=playing;musicShell?.classList.toggle('is-playing',playing);if(!musicToggle)return;const icon=musicToggle.querySelector('.music-toggle-icon'),label=musicToggle.querySelector('.music-toggle-label');if(icon)icon.textContent=playing?'Ⅱ':'▶';if(label)label.textContent=playing?'Dừng nhạc':'Phát nhạc';musicToggle.setAttribute('aria-pressed',String(playing));musicToggle.setAttribute('aria-label',(playing?'Dừng ':'Phát ')+(config.musicTitle||'nhạc nền'));}
+  const musicExpand=$('#music-expand'),musicControls=$('#music-controls');
+  let musicWantsPlay=true,musicPlaying=false,musicHasPlayed=false,musicExpanded=true;
+  function setMusicExpanded(expanded) {
+    if (!expanded && musicControls?.contains(document.activeElement)) {
+      musicExpand?.focus({ preventScroll: true });
+    }
+    musicExpanded = expanded;
+    musicShell?.classList.toggle('is-expanded', expanded);
+    musicExpand?.setAttribute('aria-expanded', String(expanded));
+    musicExpand?.setAttribute('aria-label', (expanded ? 'Thu gọn' : 'Mở') + ' trình phát nhạc');
+    if (musicControls) {
+      musicControls.inert = !expanded;
+      musicControls.setAttribute('aria-hidden', String(!expanded));
+    }
+  }
+  function syncMusicButton(playing) {
+    musicPlaying = playing;
+    musicShell?.classList.toggle('is-playing', playing);
+    if (!musicToggle) return;
+    const icon = musicToggle.querySelector('.music-toggle-icon');
+    if (icon) icon.textContent = playing ? 'Ⅱ' : '▶';
+    musicToggle.setAttribute('aria-pressed', String(playing));
+    musicToggle.setAttribute('aria-label', (playing ? 'Dừng ' : 'Phát ') + (config.musicTitle || 'nhạc nền'));
+  }
   async function playMusic(){musicWantsPlay=true;if(!musicAudio)return;musicAudio.volume=.38;try{await musicAudio.play();}catch{syncMusicButton(false);}}
   function pauseMusic(){musicWantsPlay=false;musicAudio?.pause();syncMusicButton(false);}
   function initMusicPlayer(){
     if(!musicToggle||!musicShell||!musicAudio||!config.musicFile){if(musicShell)musicShell.hidden=true;return;}
+    setMusicExpanded(true);
     musicAudio.src=config.musicFile;
     musicAudio.volume=.38;
+    const unlock = event => {
+      if (musicShell.contains(event.target)) return;
+      playMusic();
+    };
     musicAudio.addEventListener('play',()=>syncMusicButton(true));
+    musicAudio.addEventListener('playing', () => {
+      syncMusicButton(true);
+      if (musicHasPlayed) return;
+      musicHasPlayed = true;
+      if (musicExpand && musicControls) setMusicExpanded(false);
+      document.removeEventListener('pointerdown', unlock, true);
+      document.removeEventListener('keydown', unlock, true);
+    });
     musicAudio.addEventListener('pause',()=>syncMusicButton(false));
     musicAudio.addEventListener('ended',()=>{if(musicWantsPlay)playMusic();});
     musicAudio.addEventListener('error',()=>{syncMusicButton(false);musicToggle.title='Không thể tải file nhạc nền.';});
     musicToggle.addEventListener('click',()=>musicPlaying?pauseMusic():playMusic());
-    const unlock=event=>{if(event.target.closest?.('#music-toggle'))return;playMusic();document.removeEventListener('pointerdown',unlock,true);};
+    musicExpand?.addEventListener('click', () => setMusicExpanded(!musicExpanded));
+    musicShell.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !musicExpanded) return;
+      event.preventDefault();
+      setMusicExpanded(false);
+      musicExpand?.focus({ preventScroll: true });
+    });
+    document.addEventListener('pointerdown', event => {
+      if (musicHasPlayed && musicExpanded && !musicShell.contains(event.target)) setMusicExpanded(false);
+    }, true);
     document.addEventListener('pointerdown',unlock,true);
-    document.addEventListener('keydown',()=>playMusic(),{once:true});
+    document.addEventListener('keydown',unlock,true);
     window.addEventListener('pageshow',()=>{if(musicWantsPlay)playMusic();});
     window.addEventListener('focus',()=>{if(musicWantsPlay)playMusic();});
     playMusic();
@@ -399,5 +532,6 @@
   render();
   initPhotoMotion();
   initMusicPlayer();
+  initInvitationGate();
   if(!base.personalized)readConfig().then(saved=>{if(saved&&Array.isArray(saved.photos)&&saved.photos.length){config={...config,...saved};render();}});
 })();

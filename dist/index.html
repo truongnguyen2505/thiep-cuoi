@@ -13,8 +13,27 @@
   <link rel="stylesheet" href="styles.css">
   <script src="config.js" defer></script>
   <script src="app.js" defer></script>
+  <noscript><style>.invitation-gate{display:none!important}body.invitation-locked{overflow:auto!important}</style></noscript>
 </head>
-<body>
+<body class="invitation-locked">
+  <div class="invitation-gate" id="invitation-gate" role="dialog" aria-modal="true" aria-labelledby="invitation-gate-title" aria-describedby="invitation-gate-hint">
+    <div class="invitation-gate-panel invitation-gate-panel-left" aria-hidden="true"></div>
+    <div class="invitation-gate-panel invitation-gate-panel-right" aria-hidden="true"></div>
+    <div class="invitation-gate-card">
+      <p class="invitation-gate-kicker">THIỆP MỜI LỄ CƯỚI</p>
+      <h1 id="invitation-gate-title"><span data-bind="groom">Đức Trường</span><em>&</em><span data-bind="bride">Thùy Quỳnh</span></h1>
+      <p class="invitation-gate-date" data-bind="heroDate">24 . 11 . 2026</p>
+      <div class="invitation-gate-envelope" aria-hidden="true">
+        <span class="invitation-gate-flap invitation-gate-flap-left"></span>
+        <span class="invitation-gate-flap invitation-gate-flap-right"></span>
+      </div>
+      <button class="invitation-open-button" id="invitation-open" type="button">
+        <span class="invitation-wax-seal" aria-hidden="true">♡</span>
+        <span>Mở thiệp</span>
+      </button>
+      <p class="invitation-gate-hint" id="invitation-gate-hint">Chạm vào dấu sáp để mở lời mời</p>
+    </div>
+  </div>
   <div class="petal-field" aria-hidden="true">
     <i style="--x:5%;--size:10px;--duration:19s;--delay:-3s;--drift:34px;--spin:420deg;--petal-opacity:.14;--blur:.8px"></i>
     <i style="--x:14%;--size:14px;--duration:24s;--delay:-17s;--drift:-26px;--spin:-360deg;--petal-opacity:.12;--blur:1.1px"></i>
@@ -117,10 +136,14 @@
     <section id="schedule" class="section schedule-wrap"><div class="schedule-card"><p class="eyebrow">CÙNG NHAU TẠO NÊN KỶ NIỆM</p><h2 class="section-title">Lịch trình ngày cưới</h2><div id="timeline" class="timeline"></div><span class="schedule-footer">let the celebration begin</span></div></section>
     <footer class="site-footer"><svg class="botanical footer-leaf" aria-hidden="true"><use href="#sprig"/></svg><p class="thank-you">Thank you!</p><p>Vì đã là một phần trong hành trình yêu thương của chúng mình.</p><p class="footer-couple"><span data-bind="groom">Đức Trường</span> <i>&</i> <span data-bind="bride">Thúy Quỳnh</span></p><p class="footer-date" data-bind="heroDate">24 . 11 . 2026</p><div class="flourish"><span></span>♡<span></span></div><a href="#home" class="back-top">VỀ ĐẦU THIỆP ↑</a></footer>
   </main>
-  <aside class="music-player" id="music-player" aria-label="Trình phát nhạc nền">
-    <span class="music-disc" aria-hidden="true">♫</span>
-    <span class="music-copy"><strong data-bind="musicTitle">Ngày Đầu Tiên</strong><small><span data-bind="musicArtist">Đức Phúc</span> · Nhạc nền</small></span>
-    <button type="button" id="music-toggle" aria-label="Phát nhạc Ngày Đầu Tiên" aria-pressed="false"><span class="music-toggle-icon" aria-hidden="true">▶</span><span class="music-toggle-label">Phát nhạc</span></button>
+  <aside class="music-player is-expanded" id="music-player" aria-label="Trình phát nhạc nền">
+    <div class="music-controls" id="music-controls">
+      <button type="button" id="music-toggle" aria-label="Phát nhạc Ngày Đầu Tiên" aria-pressed="false"><span class="music-toggle-icon" aria-hidden="true">▶</span></button>
+      <span class="music-copy"><strong data-bind="musicTitle">Ngày Đầu Tiên</strong><small><span data-bind="musicArtist">Đức Phúc</span> · Nhạc nền</small></span>
+    </div>
+    <button type="button" class="music-disc-toggle" id="music-expand" aria-label="Thu gọn trình phát nhạc" aria-expanded="true" aria-controls="music-controls">
+      <span class="music-disc" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 17V6l10-2v11M10 9l10-2"/><ellipse cx="7" cy="17" rx="3" ry="2"/><ellipse cx="17" cy="15" rx="3" ry="2"/></svg></span>
+    </button>
     <audio id="music-source" src="assets/ngay_dau_tien.mp3" preload="auto" autoplay loop playsinline></audio>
   </aside>
   <div class="toast" id="toast" role="status"></div>
