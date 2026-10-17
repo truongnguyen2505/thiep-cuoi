@@ -9,6 +9,7 @@ window.WEDDING_CONFIG = {
   date: '2026-11-24', ceremonyTime: '09:00',
   lunarDate: 'Tức ngày 16 tháng 10 năm Bính Ngọ',
   ceremonyLocation: 'Tư gia nhà trai', ceremonyAddress: 'Thôn Yên Khê, xã Phù Đổng, TP. Hà Nội',
+  ceremonyMapUrl: 'https://maps.app.goo.gl/SuGVEpgqStGFgGFo7',
   brideCeremonyLocation: 'Tư gia nhà gái', brideCeremonyAddress: 'Thôn Lại Hoàng, xã Phù Đổng, TP. Hà Nội',
   receptionDate: '2026-11-23', receptionTime: '17:00',
   receptionLunarDate: 'Tức ngày 15 tháng 10 năm Bính Ngọ',

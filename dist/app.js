@@ -88,7 +88,7 @@
     $('meta[name=description]').content='Trân trọng kính mời bạn đến chung vui trong ngày thành hôn của '+config.groom+' và '+config.bride+'.';
     $$('[data-photo]').forEach(e=>{const n=Number(e.dataset.photo);e.src=photo(n);e.style.objectPosition='50% '+(config.photoPositions[n%config.photos.length]??50)+'%';});
     $$('[data-bind="groomOrder"],[data-bind="brideOrder"]').forEach(e=>e.hidden=!e.textContent.trim());
-    $('#groom-ceremony-map').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(config.ceremonyAddress);
+    $('#groom-ceremony-map').href=safeURL(config.ceremonyMapUrl)||'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(config.ceremonyAddress);
     $('#bride-ceremony-map').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(config.brideCeremonyAddress);
     renderAlbum();renderReception();clearInterval(countdownInterval);countdownInterval=setInterval(renderCountdown,1000);
     $('#timeline').replaceChildren(...config.schedule.map(row=>{const e=text('div','', 'timeline-row'),when=text('span','','timeline-when');when.append(text('span',row.time,'timeline-time'),text('small',shortDate(row.date||config.date),'timeline-date'));e.append(text('span',icons[row.icon]||'✧','timeline-icon'),when,text('span','','timeline-dot'),text('span',row.title,'timeline-name'));return e;}));
