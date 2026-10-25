@@ -88,3 +88,33 @@ test('production routes cover only the invitation path and preview has no domain
   ]);
   assert.ok(!preview.routes?.length);
 });
+
+test('admin links gain a trailing slash and retain their query', async () => {
+  for (const pathname of ['/admin', '/thiep-cuoi/admin']) {
+    const response = await worker.fetch(new Request(origin + pathname + '?source=bookmark'), {
+      ASSETS: { fetch() { assert.fail('The canonical redirect must not read assets.'); } }
+    });
+    assert.equal(response.status, 308);
+    assert.equal(response.headers.get('Location'), origin + pathname + '/?source=bookmark');
+  }
+});
+
+test('the admin page and its assets work at the root and under the invitation path', async () => {
+  const files = [
+    ['admin/', 'admin/index.html'],
+    ['guest.js', 'guest.js'],
+    ['admin.js', 'admin.js'],
+    ['admin.css', 'admin.css']
+  ];
+  for (const basePath of ['/', '/thiep-cuoi/']) {
+    for (const [pathname, file] of files) {
+      let received;
+      const response = await worker.fetch(new Request(origin + basePath + pathname), {
+        ASSETS: { fetch(request) { received = request; return new Response('asset'); } }
+      });
+      assert.equal(new URL(received.url).pathname, '/' + pathname);
+      assert.equal(response.status, 200);
+      assert.ok(fs.existsSync(new URL('../dist/' + file, import.meta.url)));
+    }
+  }
+});

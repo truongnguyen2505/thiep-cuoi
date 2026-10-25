@@ -128,3 +128,16 @@ Các lệnh chạy từ máy Windows có trong `LENH-RELEASE-WINDOWS.md`. Ghi l�
 - Bộ này chưa đăng nhập hoặc deploy vào tài khoản Cloudflare của bạn. Sau khi bạn kết nối GitHub và chọn Save and Deploy, Cloudflare mới phát hành trang trên tài khoản của bạn.
 
 Hướng dẫn được đối chiếu tài liệu Cloudflare ngày 15/10/2026.
+
+## Tạo link mời theo tên khách
+
+Mở **/thiep-cuoi/admin/** trên tên miền thiệp, nhập tên người nhận rồi chọn **Sao chép link**.
+Nút **Mở thiệp xem thử** cho phép kiểm tra tên trước khi gửi. Link có dạng
+**/thiep-cuoi/?to=Anh+Minh**; tên tiếng Việt và ký tự đặc biệt được mã hóa tự động.
+
+Khách sẽ thấy **Kính mời: [tên người nhận]** trên màn mở phong bì và trong phần lời mời.
+Link không có tên hoặc tên trống dùng **Quý khách**. Mỗi link tự mang tên của người nhận;
+trang tạo link không lưu danh sách khách hay thay đổi nội dung thiệp.
+
+Khi chạy **npm run dev**, mở http://127.0.0.1:8787/thiep-cuoi/admin/.
+Để dùng trên tên miền chính, phát hành các thay đổi theo quy trình release ở trên.

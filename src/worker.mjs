@@ -4,7 +4,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === BASE_PATH) {
+    if (url.pathname === BASE_PATH || url.pathname === BASE_PATH + '/admin' || url.pathname === '/admin') {
       url.pathname += '/';
       return Response.redirect(url.href, 308);
     }

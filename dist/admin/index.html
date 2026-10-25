@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#84976d">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="same-origin">
+  <title>Tạo link mời cưới</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../admin.css">
+  <script src="../guest.js" defer></script>
+  <script src="../admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <header class="admin-heading">
+      <a class="admin-brand" href="../">THIỆP MỜI LỄ CƯỚI</a>
+      <h1>Tạo link mời cưới</h1>
+      <p>Nhập tên người nhận, sao chép link và gửi một lời mời dành riêng cho họ.</p>
+    </header>
+
+    <section class="admin-card" aria-labelledby="admin-form-title">
+      <p class="admin-step">01 · CHUẨN BỊ LỜI MỜI</p>
+      <h2 id="admin-form-title">Bạn muốn mời ai?</h2>
+      <form id="guest-link-form">
+        <label for="guest-name">Tên người nhận</label>
+        <input id="guest-name" name="guestName" type="text" required maxlength="120"
+          autocomplete="off" placeholder="Ví dụ: Anh Minh và gia đình" aria-describedby="guest-name-help">
+        <p class="admin-help" id="guest-name-help">Nhập cả cách xưng hô bạn muốn xuất hiện trên thiệp.</p>
+
+        <label for="guest-link">Link gửi khách</label>
+        <textarea id="guest-link" rows="3" readonly spellcheck="false"
+          aria-describedby="guest-link-help" placeholder="Link sẽ xuất hiện sau khi bạn nhập tên."></textarea>
+        <p class="admin-help" id="guest-link-help">Sao chép link này để gửi qua Zalo, Messenger hoặc tin nhắn.</p>
+
+        <div class="admin-actions">
+          <button id="copy-guest-link" type="submit" disabled>Sao chép link</button>
+          <a id="preview-guest-link" class="admin-preview-link" target="_blank" rel="noopener noreferrer" aria-disabled="true">Mở thiệp xem thử ↗</a>
+        </div>
+        <p class="admin-status" id="copy-status" role="status" aria-live="polite" aria-atomic="true"></p>
+      </form>
+      <noscript><p>Bạn cần bật JavaScript để tạo và sao chép link mời.</p></noscript>
+    </section>
+
+    <aside class="admin-preview" aria-labelledby="preview-title">
+      <p class="admin-step" id="preview-title">02 · XEM TRƯỚC LỜI MỜI</p>
+      <span class="admin-ornament" aria-hidden="true">❦</span>
+      <p class="admin-preview-greeting">Kính mời:<strong id="guest-preview" aria-live="polite">Quý khách</strong></p>
+      <span class="admin-divider" aria-hidden="true"></span>
+      <p class="admin-preview-copy">Đến chung vui cùng chúng mình<br>trong ngày hạnh phúc.</p>
+      <p class="admin-preview-note">Tên này sẽ xuất hiện khi khách mở thiệp từ link bạn gửi.</p>
+    </aside>
+
+    <footer class="admin-footer"><a href="../">← Về trang thiệp</a></footer>
+  </main>
+</body>
+</html>

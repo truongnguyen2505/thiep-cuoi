@@ -1121,6 +1121,8 @@ body.invitation-locked {
   overflow: hidden;
   color: #536443;
   background: #f4f0e3;
+  overflow-y: auto;
+  align-items: safe center;
   perspective: 1200px;
   isolation: isolate;
 }
@@ -1201,7 +1203,7 @@ body.invitation-locked {
 .invitation-gate-kicker,
 .invitation-gate-date,
 .invitation-gate-hint {
-  font-family: var(--sans);
+  font-family: var(--serif);
   letter-spacing: .2em;
   text-transform: uppercase;
 }
@@ -1214,13 +1216,15 @@ body.invitation-locked {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 0;
   margin: 0;
   color: #4f6241;
-  font-family: var(--script);
+  font-family: var(--serif);
   font-size: clamp(37px, 11vw, 54px);
   font-weight: 400;
-  line-height: .95;
+  font-style: italic;
+  line-height: 1.45;
   text-wrap: balance;
 }
 .invitation-gate-card h1 span {
@@ -1228,9 +1232,11 @@ body.invitation-locked {
 }
 .invitation-gate-card h1 em {
   color: #a68e52;
-  font-family: var(--serif);
+  font-family: var(--script);
   font-size: .56em;
+  font-style: normal;
   font-weight: 400;
+  line-height: 1;
 }
 .invitation-gate-date {
   margin: 15px 0 23px;
@@ -1306,7 +1312,7 @@ body.invitation-locked {
     radial-gradient(circle at 35% 28%, #91a178 0 8%, transparent 9%),
     radial-gradient(circle at 50% 50%, #7e9169 0 58%, #657a53 59% 67%, #9baa84 68% 71%, transparent 72%);
   box-shadow: 0 8px 18px #3c4d303f, inset 0 2px 2px #ffffff52;
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .11em;
@@ -1381,7 +1387,6 @@ body.invitation-locked {
     flex-direction: column;
     gap: 0;
     font-size: 39px;
-    line-height: .78;
   }
   .invitation-gate-card h1 em {
     margin: 8px 0;
@@ -1403,3 +1408,23 @@ body.invitation-locked {
   }
 }
 
+
+/* The recipient is taken from the invitation link. */
+.guest-greeting {
+  font-family: var(--serif);
+  font-size: var(--type-detail);
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.guest-greeting strong {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--type-lead);
+  font-style: italic;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.invitation-gate-guest { margin: -7px 0 20px; }
+.invitation-guest { margin: 20px auto 0; }

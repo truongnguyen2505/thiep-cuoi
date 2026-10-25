@@ -18,7 +18,7 @@
     "release:preview": "node scripts/release.mjs --preview",
     "versions": "wrangler versions list",
     "rollback": "wrangler rollback",
-    "test": "node --test scripts/worker.test.mjs"
+    "test": "node --test scripts/worker.test.mjs scripts/guest.test.mjs scripts/admin.test.mjs"
   },
   "devDependencies": {
     "wrangler": "4.151.0"

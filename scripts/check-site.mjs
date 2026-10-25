@@ -50,9 +50,13 @@ export function checkSite(root = projectRoot) {
   assert(/id="invitation-gate"/.test(html), 'Thiếu màn hình phong thư mở thiệp.');
   assert(/id="invitation-open"/.test(html), 'Thiếu nút mở thiệp.');
   for (const match of html.matchAll(/<(?:script|link|img)\b[^>]*\b(?:src|href)="([^"]+)"/gi)) localFile(match[1]);
+  const admin = fs.readFileSync(path.join(dist, 'admin/index.html'), 'utf8');
+  for (const match of admin.matchAll(/<(?:script|link|img)\b[^>]*\b(?:src|href)="([^"]+)"/gi)) {
+    localFile(new URL(match[1], 'https://assets.local/admin/').pathname);
+  }
   const css = fs.readFileSync(path.join(dist, 'styles.css'), 'utf8');
   for (const match of css.matchAll(/url\(\s*['"]?(assets\/fonts\/[^'")\s]+)['"]?\s*\)/g)) localFile(match[1]);
-  for (const name of ['app.js', 'config.js']) {
+  for (const name of ['app.js', 'config.js', 'guest.js', 'admin.js']) {
     new vm.Script(fs.readFileSync(path.join(dist, name), 'utf8'), { filename: name });
   }
   const context = { window: {} };
