@@ -87,7 +87,6 @@
       <div class="invitation-card">
         <span class="mini-sprig" aria-hidden="true">❦</span>
         <h2 class="section-title">Thông tin lễ cưới</h2>
-        <p class="guest-greeting invitation-guest">Kính mời: <strong data-bind="guestName">Quý khách</strong></p>
         <div class="families">
           <div><p class="small-label">NHÀ TRAI</p><p data-bind="groomParents">Ông Nguyễn Đức Thảo<br>Bà Vũ Thị Cúc</p><p class="family-address" data-bind="groomHometown">Thôn Yên Khê<br>Xã Phù Đổng, TP. Hà Nội</p></div>
           <span class="family-rule"></span>
@@ -120,7 +119,9 @@
 
     <section id="celebration" class="section reception-wrap">
       <div class="reception-card"><svg class="botanical reception-leaf" aria-hidden="true"><use href="#sprig"/></svg>
-        <p class="eyebrow">TRÂN TRỌNG KÍNH MỜI</p><h2 class="display-title">Đến dự bữa cơm thân mật</h2><p class="reception-intro">Sự hiện diện của bạn là món quà<br>ý nghĩa nhất trong ngày hạnh phúc của chúng mình.</p>
+        <p class="eyebrow">TRÂN TRỌNG KÍNH MỜI</p>
+        <p class="guest-greeting reception-guest"><strong data-bind="guestName">Quý khách</strong></p>
+        <h2 class="display-title">Đến dự bữa cơm thân mật</h2><p class="reception-intro">Sự hiện diện của bạn là món quà<br>ý nghĩa nhất trong ngày hạnh phúc của chúng mình.</p>
         <div class="reception-tabs" role="group" aria-label="Chọn gia đình mời tiệc"><button data-reception="groom" aria-pressed="true">Tiệc nhà trai</button><button data-reception="bride" aria-pressed="false">Tiệc nhà gái</button></div>
         <p class="small-label">BỮA CƠM THÂN MẬT ĐƯỢC TỔ CHỨC VÀO LÚC</p><p class="reception-time" data-bind="receptionTime">17:00</p>
         <div class="date-divider"><span data-reception-bind="weekday">THỨ HAI</span><strong data-reception-bind="day">23</strong><span data-reception-bind="monthLabel">THÁNG 11</span></div><p class="year" data-reception-bind="year">2026</p>

@@ -1427,4 +1427,4 @@ body.invitation-locked {
   text-wrap: balance;
 }
 .invitation-gate-guest { margin: -7px 0 20px; }
-.invitation-guest { margin: 20px auto 0; }
+.reception-guest { margin: 12px auto 20px; }
