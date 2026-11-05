@@ -1,6 +1,6 @@
 // Sửa trực tiếp tại đây hoặc dùng nút “Chỉnh thiệp” trên trang.
 window.WEDDING_CONFIG = {
-  contentVersion: 'truong-quynh-2026-11-v3',
+  contentVersion: 'truong-quynh-2026-11-v4',
   editorEnabled: false,
   personalized: true,
   groom: 'Đức Trường', bride: 'Thúy Quỳnh',
@@ -20,18 +20,22 @@ window.WEDDING_CONFIG = {
   brideMapUrl: 'https://maps.app.goo.gl/YkracWhe8b6aCfLR6',
   groomParents: 'Ông Nguyễn Đức Thảo\nBà Vũ Thị Cúc', groomHometown: 'Thôn Yên Khê\nXã Phù Đổng, TP. Hà Nội',
   brideParents: 'Ông Đinh Văn Chiến\nBà Nguyễn Thị Luyến', brideHometown: 'Thôn Lại Hoàng\nXã Phù Đổng, TP. Hà Nội',
-  // Tạm dùng 2 ảnh minh họa cho 8 vị trí; thay từng đường dẫn bằng ảnh cưới của bạn.
+  // Hai ảnh đầu hiển thị ở đầu thiệp; các ảnh còn lại nằm trong slide album.
   photos: [
-    'assets/wedding-portrait.webp',
-    'assets/wedding-garden.webp',
-    'assets/wedding-portrait.webp',
-    'assets/wedding-garden.webp',
-    'assets/wedding-portrait.webp',
-    'assets/wedding-garden.webp',
-    'assets/wedding-portrait.webp',
-    'assets/wedding-garden.webp'
+    'assets/images/img1.webp',
+    'assets/images/img2.webp',
+    'assets/images/img3.webp',
+    'assets/images/img4.webp',
+    'assets/images/img5.webp',
+    'assets/images/img6.webp',
+    'assets/images/img7.webp',
+    'assets/images/img8.webp',
+    'assets/images/img9.webp',
+    'assets/images/img10.webp',
+    'assets/images/img11.webp',
+    'assets/images/img12.webp'
   ],
-  photoPositions: [45, 50, 38, 56, 50, 42, 54, 48],
+  photoPositions: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
   schedule: [{date:'2026-11-23',time:'17:00',title:'Tiệc thân mật hai gia đình',icon:'glass'},{date:'2026-11-23',time:'21:00',title:'Giao lưu họ nhà gái',icon:'music'},{date:'2026-11-24',time:'09:00',title:'Lễ vu quy & lễ thành hôn',icon:'heart'}],
   musicTitle: 'Ngày Đầu Tiên', musicArtist: 'Đức Phúc',
   musicFile: 'assets/ngay_dau_tien.mp3',

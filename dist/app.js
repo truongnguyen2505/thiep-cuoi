@@ -7,6 +7,8 @@
   const key = 'olive-wedding-' + (base.contentVersion || 'v1');
   const icons = {rings:'♧',heart:'♡',glass:'♧',music:'♫',spark:'✧'};
   const photo = n => config.photos[n % config.photos.length] || base.photos[0];
+  const albumPhotoStart = 2;
+  const albumPhotos = () => config.photos.slice(albumPhotoStart);
   const text = (tag, value, cls) => {const e = document.createElement(tag); e.textContent = value; if(cls)e.className=cls; return e;};
   const escapeScript = value => JSON.stringify(value).replace(/</g, '\\u003c');
   const motionPreference = window.matchMedia?.('(prefers-reduced-motion: reduce)') || { matches: true };
@@ -103,7 +105,8 @@
   function renderReception(){const reception=currentReception(),values={...dateValues(reception.date),...reception};$$('[data-reception-bind]').forEach(e=>e.textContent=values[e.dataset.receptionBind]??'');$$('[data-reception]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.reception===receptionSide)));const query=encodeURIComponent(reception.venue+', '+reception.address),iframe=$('#venue-map'),mapURL=reception.mapEmbedUrl||'https://maps.google.com/maps?q='+query+'&z=15&output=embed';if(iframe.getAttribute('src')!==mapURL)iframe.src=mapURL;$('#map-link').href=reception.mapUrl||'https://www.google.com/maps/search/?api=1&query='+query;$('#directions-link').href=reception.mapUrl||'https://www.google.com/maps/dir/?api=1&destination='+query;renderCalendar(new Date(reception.date+'T12:00:00+07:00'));renderCountdown();}
   $$('[data-reception]').forEach(b=>b.addEventListener('click',()=>{receptionSide=b.dataset.reception;renderReception();}));
   function wrapAlbumIndex(index) {
-    return (index % config.photos.length + config.photos.length) % config.photos.length;
+    const count = albumPhotos().length;
+    return count ? (index % count + count) % count : 0;
   }
 
   function syncAlbumControls() {
@@ -113,8 +116,8 @@
       dot.setAttribute('aria-pressed', String(active));
     });
     albumCards.forEach((card, index) => card.classList.toggle('is-active', index === albumIndex));
-    $('#album-progress').textContent = 'Ảnh ' + (albumIndex + 1) + ' / ' + config.photos.length;
-    $('#album-prev').disabled = $('#album-next').disabled = config.photos.length < 2;
+    $('#album-progress').textContent = 'Ảnh ' + (albumIndex + 1) + ' / ' + albumPhotos().length;
+    $('#album-prev').disabled = $('#album-next').disabled = albumPhotos().length < 2;
   }
 
   function nearestAlbumIndex() {
@@ -172,17 +175,17 @@
   }
 
   function renderAlbum() {
-    const signature = JSON.stringify([config.photos, config.photoPositions, config.groom, config.bride]);
+    const signature = JSON.stringify([albumPhotos(), config.photoPositions.slice(albumPhotoStart), config.groom, config.bride]);
     if (signature !== albumSignature) {
       albumSignature = signature;
-      albumCards = config.photos.map((src, index) => {
+      albumCards = albumPhotos().map((src, index) => {
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'album-card album-slide';
         card.dataset.album = String(index);
-        card.setAttribute('aria-label', 'Phóng to ảnh ' + (index + 1) + ' / ' + config.photos.length);
+        card.setAttribute('aria-label', 'Phóng to ảnh ' + (index + 1) + ' / ' + albumPhotos().length);
         const image = document.createElement('img');
-        image.dataset.photo = String(index);
+        image.dataset.photo = String(index + albumPhotoStart);
         image.src = src;
         image.alt = 'Khoảnh khắc của ' + config.groom + ' và ' + config.bride + ', ảnh ' + (index + 1);
         image.loading = 'lazy';
@@ -190,7 +193,7 @@
         image.draggable = false;
         image.width = 600;
         image.height = 800;
-        image.style.objectPosition = '50% ' + (config.photoPositions[index] ?? 50) + '%';
+        image.style.objectPosition = '50% ' + (config.photoPositions[index + albumPhotoStart] ?? 50) + '%';
         const caption = text('span', config.groom + ' & ' + config.bride, 'photo-caption');
         caption.setAttribute('aria-hidden', 'true');
         const frame = document.createElement('div');
@@ -200,7 +203,7 @@
         return card;
       });
       albumTrack.replaceChildren(...albumCards);
-      albumDots = config.photos.map((_, index) => {
+      albumDots = albumPhotos().map((_, index) => {
         const dot = document.createElement('button');
         dot.type = 'button';
         dot.dataset.albumIndex = String(index);
@@ -298,14 +301,14 @@
   $('#photo-stack').addEventListener('keydown', event => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     event.preventDefault();
-    const next = event.key === 'Home' ? 0 : event.key === 'End' ? config.photos.length - 1 :
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? albumPhotos().length - 1 :
       albumIndex + (event.key === 'ArrowRight' ? 1 : -1);
     selectAlbum(next);
     albumCards[albumIndex]?.focus({ preventScroll: true });
   });
 
   async function renderLightbox() {
-    const request = ++lightboxRequest, index = albumIndex, src = photo(index);
+    const request = ++lightboxRequest, index = albumIndex, src = photo(index + albumPhotoStart);
     const image = $('#lightbox-img');
     if (image.getAttribute('src') !== src) {
       const next = new Image();
@@ -316,8 +319,8 @@
     lightboxAnimation?.cancel();
     image.src = src;
     image.alt = 'Ảnh cưới ' + (index + 1) + ' của ' + config.groom + ' và ' + config.bride;
-    image.style.objectPosition = '50% ' + (config.photoPositions[index] ?? 50) + '%';
-    $('#lightbox-counter').textContent = (index + 1) + ' / ' + config.photos.length;
+    image.style.objectPosition = '50% ' + (config.photoPositions[index + albumPhotoStart] ?? 50) + '%';
+    $('#lightbox-counter').textContent = (index + 1) + ' / ' + albumPhotos().length;
     if (!motionPreference.matches && typeof image.animate === 'function') {
       lightboxAnimation = image.animate([
         { opacity: 0, transform: 'scale(.97)' },
@@ -493,7 +496,7 @@
   };
   function addFields(target,items){const container=$(target);container.replaceChildren(...items.map(([name,label,type='text',full])=>{const div=text('div','','editor-field'+(full?' full':'')),l=text('label',label);l.htmlFor='edit-'+name;const inp=document.createElement(type==='textarea'?'textarea':'input');inp.id=l.htmlFor;inp.name=name;if(type!=='textarea')inp.type=type;else inp.rows=2;inp.value=config[name]||'';if(['groom','bride','groomFull','brideFull','date','ceremonyTime','receptionDate','receptionTime','venue','address','brideVenue','brideAddress','ceremonyAddress','brideCeremonyAddress'].includes(name))inp.required=true;inp.maxLength=400;div.append(l,inp);return div;}));}
   let pendingPhotos=[],pendingPositions=[];
-  function fillEditor(){pendingPhotos=[...config.photos];pendingPositions=[...config.photoPositions];addFields('#couple-fields',fields.couple);addFields('#event-fields',fields.event);addFields('#family-fields',fields.family);addFields('#integration-fields',fields.integration);$('#edit-schedule').value=config.schedule.map(r=>(r.date||config.date)+' | '+r.time+' | '+r.title).join('\n');$('#editor-status').textContent='Thay đổi được lưu trong trình duyệt này. Chọn “Tải thiệp hoàn chỉnh” để tạo bản đem chia sẻ.';$('#photo-editors').replaceChildren(...Array.from({length:8},(_,i)=>{const row=text('div','','photo-editor'),img=document.createElement('img');img.src=photo(i);img.alt='Ảnh '+(i+1);img.style.objectPosition='50% '+(pendingPositions[i]??50)+'%';const controls=document.createElement('div'),label=text('label','Ảnh '+(i+1)+(i===0?' · ảnh bìa':''));label.htmlFor='photo-upload-'+i;const file=document.createElement('input');file.type='file';file.accept='image/*';file.id=label.htmlFor;file.addEventListener('change',async()=>{if(!file.files[0])return;try{const data=await readPhoto(file.files[0]);pendingPhotos[i]=data;pendingPositions[i]=50;img.src=data;range.value='50';img.style.objectPosition='50% 50%';$('#editor-status').textContent='Đã chọn ảnh '+(i+1)+'. Nhớ chọn Lưu thay đổi.';}catch(err){toast(err.message||'Không đọc được ảnh. Hãy thử ảnh JPG, PNG hoặc WebP.');}});const position=text('p','Vị trí ảnh: trên ↔ dưới','position-label'),range=document.createElement('input');range.type='range';range.min='0';range.max='100';range.value=String(pendingPositions[i]??50);range.setAttribute('aria-label','Vị trí ảnh '+(i+1));range.addEventListener('input',()=>{pendingPositions[i]=Number(range.value);img.style.objectPosition='50% '+range.value+'%';});controls.append(label,file,position,range);row.append(img,controls);return row;}));}
+  function fillEditor(){pendingPhotos=[...config.photos];pendingPositions=[...config.photoPositions];addFields('#couple-fields',fields.couple);addFields('#event-fields',fields.event);addFields('#family-fields',fields.family);addFields('#integration-fields',fields.integration);$('#edit-schedule').value=config.schedule.map(r=>(r.date||config.date)+' | '+r.time+' | '+r.title).join('\n');$('#editor-status').textContent='Thay đổi được lưu trong trình duyệt này. Chọn “Tải thiệp hoàn chỉnh” để tạo bản đem chia sẻ.';$('#photo-editors').replaceChildren(...Array.from({length:config.photos.length},(_,i)=>{const row=text('div','','photo-editor'),img=document.createElement('img');img.src=photo(i);img.alt='Ảnh '+(i+1);img.style.objectPosition='50% '+(pendingPositions[i]??50)+'%';const controls=document.createElement('div'),label=text('label','Ảnh '+(i+1)+(i===0?' · ảnh bìa':''));label.htmlFor='photo-upload-'+i;const file=document.createElement('input');file.type='file';file.accept='image/*';file.id=label.htmlFor;file.addEventListener('change',async()=>{if(!file.files[0])return;try{const data=await readPhoto(file.files[0]);pendingPhotos[i]=data;pendingPositions[i]=50;img.src=data;range.value='50';img.style.objectPosition='50% 50%';$('#editor-status').textContent='Đã chọn ảnh '+(i+1)+'. Nhớ chọn Lưu thay đổi.';}catch(err){toast(err.message||'Không đọc được ảnh. Hãy thử ảnh JPG, PNG hoặc WebP.');}});const position=text('p','Vị trí ảnh: trên ↔ dưới','position-label'),range=document.createElement('input');range.type='range';range.min='0';range.max='100';range.value=String(pendingPositions[i]??50);range.setAttribute('aria-label','Vị trí ảnh '+(i+1));range.addEventListener('input',()=>{pendingPositions[i]=Number(range.value);img.style.objectPosition='50% '+range.value+'%';});controls.append(label,file,position,range);row.append(img,controls);return row;}));}
   function readPhoto(file){return new Promise((resolve,reject)=>{if(!file.type.startsWith('image/'))return reject(new Error('Hãy chọn tệp ảnh JPG, PNG hoặc WebP.'));if(file.size>30*1024*1024)return reject(new Error('Ảnh lớn hơn 30 MB. Hãy chọn ảnh nhỏ hơn nhé.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Không đọc được tệp ảnh.'));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Ảnh chưa được hỗ trợ. Hãy chuyển sang JPG hoặc PNG.'));img.onload=()=>{const ratio=Math.min(1,1800/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*ratio);canvas.height=Math.round(img.height*ratio);const ctx=canvas.getContext('2d');ctx.fillStyle='#fafaf4';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',.88));};img.src=reader.result;};reader.readAsDataURL(file);});}
   async function applyEditor(){
     const form=$('#editor-form');
