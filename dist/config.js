@@ -25,7 +25,7 @@ window.WEDDING_CONFIG = {
     'assets/images/img1.webp',
     'assets/images/img2.webp',
     'assets/images/img3.webp',
-    'assets/images/img4.webp',
+    'assets/images/img4X.webp',
     'assets/images/img5.webp',
     'assets/images/img6.webp',
     'assets/images/img7.webp',
